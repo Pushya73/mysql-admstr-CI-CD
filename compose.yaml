@@ -1,0 +1,37 @@
+services:
+  app:
+    build: .
+    stdin_open: true
+    tty: true
+    environment:
+      - DB_HOST=db
+      - DB_PORT=3306
+      - DB_USER=appuser
+      - DB_PASSWORD=AppDemo123!
+      - DB_NAME=names_db
+    depends_on:
+      db:
+        condition: service_healthy
+
+
+  db:
+    image: mysql:8.4
+    environment:
+      MYSQL_ROOT_PASSWORD: RootDemo123!
+      MYSQL_DATABASE: names_db
+      MYSQL_USER: appuser
+      MYSQL_PASSWORD: AppDemo123!
+    ports:
+      - "127.0.0.1:3307:3306"
+    volumes:
+      - mysql-data:/var/lib/mysql
+    healthcheck:
+      test: ["CMD", "mysqladmin", "ping", "-h", "localhost","-u", "root", "-pRootDemo123!"]
+      interval: 5s
+      timeout: 5s
+      retries: 5
+      start_period: 30s
+
+volumes:
+  mysql-data:
+    external: true
